@@ -19,7 +19,7 @@ description: |
 icon: snap/variants/oidc/icon.svg
 website: https://documentation.ubuntu.com/authd
 issues: https://github.com/canonical/authd/issues
-source-code: https://github.com/canonical/authd
+source-code: https://github.com/canonical/authd/tree/main/authd-oidc-brokers
 adopt-info: version
 grade: stable
 base: core24
@@ -47,7 +47,9 @@ slots:
 
 parts:
   broker:
-    source: authd-oidc-brokers
+    # TODO: When the replace directive in authd-oidc-brokers/go.mod is removed,
+    # change source back to 'authd-oidc-brokers' and remove the 'cd' command below.
+    source: .
     source-type: local
     plugin: nil
     build-snaps:
@@ -56,6 +58,9 @@ parts:
       - GOFLAGS: "-tags=release"
       - GOBIN: ${CRAFT_PART_INSTALL}/bin
     override-build: |
+      # TODO: Remove this 'cd' command when the replace directive in
+      # authd-oidc-brokers/go.mod is removed.
+      cd authd-oidc-brokers
       go mod download all
       go mod vendor
       VERSION=$(craftctl get version)
