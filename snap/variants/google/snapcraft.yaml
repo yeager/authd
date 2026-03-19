@@ -55,7 +55,6 @@ parts:
     build-snaps:
       - go
     build-environment:
-      - GOFLAGS: "-tags=release"
       - GOBIN: ${CRAFT_PART_INSTALL}/bin
     override-build: |
       # TODO: Remove this 'cd' command when the replace directive in
@@ -64,8 +63,7 @@ parts:
       go mod download all
       go mod vendor
       VERSION=$(craftctl get version)
-      export GOFLAGS="-ldflags=-X=github.com/canonical/authd/authd-oidc-brokers/internal/consts.Version=${VERSION}"
-      go build -tags=withgoogle -o ${GOBIN}/authd-google ./cmd/authd-oidc
+      go build -tags=withgoogle,release -ldflags "-X=github.com/canonical/authd/authd-oidc-brokers/internal/consts.Version=${VERSION}" -o ${GOBIN}/authd-google ./cmd/authd-oidc
     after:
       - version
   config:
