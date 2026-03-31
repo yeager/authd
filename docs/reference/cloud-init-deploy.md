@@ -36,7 +36,14 @@ Define the necessary environmental variables:
 
 ## Install authd
 
-Add the authd PPA to the system's software sources and install authd:
+**Ubuntu 26.04 LTS (Resolute) and later:** `authd` is available directly from the Ubuntu archive:
+
+```yaml
+packages:
+  - authd
+```
+
+**Ubuntu 24.04 LTS (Noble):** `authd` must be installed from the stable PPA. Add it to the system's software sources:
 
 ```yaml
 apt:

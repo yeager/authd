@@ -15,26 +15,20 @@ authd is delivered as a Debian package for Ubuntu Desktop and Ubuntu Server.
 
 ## System requirements
 
-* Distribution: Ubuntu Desktop 24.04 LTS or Ubuntu Server 24.04 LTS
+* Distribution: Ubuntu Desktop 24.04 LTS or later, or Ubuntu Server 24.04 LTS or later
 * Architectures: amd64, arm64
 
 ## Install authd
 
-You can install authd from the [stable PPA](https://launchpad.net/~ubuntu-enterprise-desktop/+archive/ubuntu/authd).
+**Ubuntu 26.04 LTS (Resolute) and later:** `authd` is available directly from the Ubuntu archive.
 
-To add this PPA to your system's software sources, run the following command:
+**Ubuntu 24.04 LTS (Noble):** `authd` must be installed from the [stable PPA](https://launchpad.net/~ubuntu-enterprise-desktop/+archive/ubuntu/authd):
 
 ```shell
 sudo add-apt-repository ppa:ubuntu-enterprise-desktop/authd
 ```
 
-```{note}
-The stable PPA release of authd can be used today as an authentication service.
-This project is under active development and the release of authd to the
-official archive is planned for Ubuntu 26.04 LTS.
-```
-
-Then install authd and any additional Debian packages needed for your system of
+Install authd and any additional Debian packages needed for your system of
 choice:
 
 :::::{tab-set}
