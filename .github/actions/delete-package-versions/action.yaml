@@ -1,0 +1,66 @@
+name: 'Delete package versions'
+description: 'Deletes old versions of a GitHub package, keeping the most recent ones'
+inputs:
+  token:
+    description: 'GitHub token with packages:write permission'
+    required: true
+  package-name:
+    description: 'Name of the package (slashes are handled automatically)'
+    required: true
+  package-type:
+    description: 'Type of the package (e.g. container)'
+    required: true
+  min-versions-to-keep:
+    description: 'Minimum number of most-recent versions to keep (older ones will be deleted)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Delete old package versions
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ORG: ${{ github.repository_owner }}
+        PACKAGE_NAME: ${{ inputs.package-name }}
+        PACKAGE_TYPE: ${{ inputs.package-type }}
+        MIN_VERSIONS_TO_KEEP: ${{ inputs.min-versions-to-keep }}
+        GH_NO_UPDATE_NOTIFIER: 1
+      run: |
+        set -euo pipefail
+
+        api_path="orgs/${ORG}/packages/${PACKAGE_TYPE}/${PACKAGE_NAME}/versions"
+
+        echo "Fetching all versions of ${PACKAGE_TYPE} package '${PACKAGE_NAME}' in org '${ORG}'..."
+
+        # --paginate fetches all pages; jq extracts IDs in the order returned (newest first)
+        mapfile -t all_ids < <(gh api --paginate "${api_path}" --jq '.[].id')
+
+        total="${#all_ids[@]}"
+        echo "Found ${total} version(s) total."
+
+        if [ "${total}" -le "${MIN_VERSIONS_TO_KEEP}" ]; then
+          echo "Nothing to delete: total versions (${total}) <= min-versions-to-keep (${MIN_VERSIONS_TO_KEEP})."
+          exit 0
+        fi
+
+        # Versions to delete are everything beyond the first MIN_VERSIONS_TO_KEEP entries
+        delete_count=$((total - MIN_VERSIONS_TO_KEEP))
+        echo "Deleting ${delete_count} old version(s) (keeping the ${MIN_VERSIONS_TO_KEEP} most recent)..."
+
+        deleted=0
+        failed=0
+        for id in "${all_ids[@]:${MIN_VERSIONS_TO_KEEP}}"; do
+          if gh api --method DELETE "${api_path}/${id}"; then
+            echo "  Deleted version ID ${id}."
+            deleted=$((deleted + 1))
+          else
+            echo "  WARNING: failed to delete version ID ${id}." >&2
+            failed=$((failed + 1))
+          fi
+        done
+
+        echo "Done. Deleted: ${deleted}, failed: ${failed}."
+        if [ "${failed}" -gt 0 ]; then
+          exit 1
+        fi

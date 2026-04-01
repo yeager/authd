@@ -48,9 +48,13 @@ jobs:
     permissions:
       packages: write
     steps:
+      - uses: actions/checkout@v6
       - name: Delete e2e-test VM image OCI artifacts
-        uses: actions/delete-package-versions@v5
+        # GitHub's actions/delete-package-versions doesn't seem to support
+        # deleting internal packages, so we use our own action instead.
+        uses: ./.github/actions/delete-package-versions
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           package-name: authd/e2e-runner
           package-type: container
           min-versions-to-keep: 10
