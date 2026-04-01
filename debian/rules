@@ -21,8 +21,9 @@ export DH_GOLANG_INSTALL_ALL := 1
 # as long as it matches the go.mod go stenza which is the language requirement.
 export GOTOOLCHAIN := local
 
-# Use the debian cargo wrapper
-export CARGO_PATH := /usr/share/cargo/bin/cargo
+# Use the debian cargo wrapper; fall back to the versioned path if the default
+# cargo package is older than the minimum required version (see debian/control).
+export CARGO_PATH := $(shell ./debian/get-depends-cargo-path.sh)
 
 # Needed for Rust vendored sources tracking
 export CARGO_VENDOR_DIR := $(CURDIR)/vendor_rust
