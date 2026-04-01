@@ -13,6 +13,7 @@ if ! command -v cargo-vendor-filterer 2>/dev/null; then
 fi
 
 # Print the versions of cargo and cargo-vendor-filterer for debugging purposes.
+echo "Using cargo from: ${CARGO_PATH}"
 echo "Using cargo version: $(${CARGO_PATH} --version)"
 echo "Using cargo-vendor-filterer version: $(cargo-vendor-filterer --version)"
 
